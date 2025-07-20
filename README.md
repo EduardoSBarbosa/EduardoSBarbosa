@@ -1,8 +1,8 @@
-### Hey! My name's Eduardo S. Barbosa
+### Olá! Meu nome é Eduardo S. Barbosa
 
-- 🌱 I’m currently a Computer Science student at the Pontifical Catholic University of Rio Grande do Sul (PUCRS).
-- 💬 Always avaliable to learn something new.
-- 😄 Pronouns: he/him 
+- 🌱 Atualmente sou estudante de Ciência da Computação na Pontifícia Universidade Católica do Rio Grande do Sul (PUCRS).
+- 💬 Sempre disponível para aprender algo novo.
+- 😄 Pronomes: ele/dele
 
 <div align="center">
   <a href="https://github.com/EduardoSBarbosa">
