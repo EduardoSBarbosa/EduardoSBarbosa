@@ -3,23 +3,72 @@ name: Generate Datas
 on:
   schedule: # execute every 12 hours
     - cron: "* */12 * * *"
-  workflow_dispatch:
+  workflow_dispatch: # Permite disparar manualmente
 
 jobs:
   build:
     name: Jobs to update datas
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permissão necessária para escrever arquivos no repositório
+
     steps:
-      # Snake Animation
-      - uses: Platane/snk@master
+      - uses: actions/checkout@v4 # Clona o repositório para que as ações possam acessá-lo
+
+      # === Ação para Gerar Estatísticas do GitHub (Exemplo 1) ===
+      - name: Generate GitHub Stats
+        uses: anuraghazra/github-readme-stats@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Token para autenticação
+          username: EduardoSBarbosa # Seu nome de usuário do GitHub
+          output_path: github-stats.svg # Nome do arquivo de saída
+          hide_title: true # Esconde o título (opcional, como na sua imagem)
+          hide_border: true # Esconde a borda (opcional, como na sua imagem)
+          # ... (outras opções de personalização que você possa ter usado na sua imagem)
+
+      # === Ação para Gerar Linguagens Mais Usadas e outras métricas (Exemplo 2: lowlighter/metrics) ===
+      # Esta ação é mais robusta e pode gerar diversos gráficos, incluindo linguagens.
+      - name: Generate metrics
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          user: EduardoSBarbosa
+          template: classic # ou flat, para um estilo mais simples
+          base: header, activity, community, repositories, metadata # Quais seções você quer
+          plugin_languages: yes # Habilita o plugin de linguagens
+          plugin_languages_ignored: javascript, html # Exemplo: linguagens a ignorar (ajuste conforme necessário)
+          plugin_languages_threshold: 0% # Inclui todas as linguagens acima de 0%
+          output_path: github-metrics.svg # Nome do arquivo de saída
+          # ... (adicione aqui outras configurações de plugins que você possa usar, por exemplo:
+          # plugin_stargazers: yes # para ver quem deu estrela
+          # plugin_followup: yes # para ver seguidores e quem você segue
+          # etc. Consulte a documentação de lowlighter/metrics para mais opções)
+
+      # Snake Animation (mantida)
+      - name: Generate Snake Animation
+        uses: Platane/snk@master
         id: snake-gif
         with:
           github_user_name: EduardoSBarbosa
           svg_out_path: dist/github-contribution-grid-snake.svg
+          # (Aqui é importante que o svg_out_path seja dist/, se você for usar o ghaction-github-pages)
 
-      - uses: crazy-max/ghaction-github-pages@v2.1.3
+      # === Passo para Mover os arquivos SVG gerados para o diretório 'dist' ===
+      # Se as ações acima não salvarem direto em 'dist', você precisa movê-los.
+      - name: Move generated SVG files
+        run: |
+          mkdir -p dist
+          cp github-stats.svg dist/
+          cp github-metrics.svg dist/
+        # OBS: Verifique os nomes de saída das ações 'anuraghazra' e 'lowlighter/metrics'
+        # e ajuste os comandos `cp` para os nomes de arquivo corretos (ex: `github-stats.svg`, `github-metrics.svg`).
+        # Se você estiver usando apenas 'lowlighter/metrics', pode ser que ele já salve no path desejado.
+
+      # Publica os resultados na branch 'output' (ou outra que você use para GH Pages)
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2.1.3
         with:
-          target_branch: output
-          build_dir: dist
+          target_branch: output # A branch para onde os arquivos SVG serão enviados
+          build_dir: dist # O diretório de onde os arquivos serão publicados
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
